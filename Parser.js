@@ -308,7 +308,12 @@ class Parser {
         indexArray.forEach((value) => {
             const [start, end] = value;
             result = result.concat(data.slice(last, start - 1));
-            const left = data[start - 1].exp;
+            let left_array;
+            if (result.length > 0 && result[result.length - 1].catagory === "array") {
+                left_array = result[result.length - 1];
+                result.pop(); //清空最红一项
+            }
+            const left = left_array ? left_array.getValue : data[start - 1].exp;
             const right = data.slice(start + 1, end).reduce((cur, next) => {
                 return cur + next.exp;
             }, '');
@@ -318,7 +323,15 @@ class Parser {
                 left,
                 right,
                 getValue: (scope) => {
-                    return scope[left][this.deepParse(right)(scope)];
+                    if (typeof left === "object") {
+                        return left[this.deepParse(right)(scope)];
+                    }
+                    else if (typeof left === "function") {
+                        return left(scope)[this.deepParse(right)(scope)];
+                    }
+                    else {
+                        return scope[left][this.deepParse(right)(scope)];
+                    }
                 },
             });
             last = end + 1;
