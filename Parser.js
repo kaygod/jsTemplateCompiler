@@ -309,9 +309,9 @@ class Parser {
             const [start, end] = value;
             result = result.concat(data.slice(last, start - 1));
             let left_array;
-            if (result.length > 0 && result[result.length - 1].catagory === "array") {
+            if (result.length > 0 && result[result.length - 1].catagory === "array") { //处理多维数组的情况
                 left_array = result[result.length - 1];
-                result.pop(); //清空最红一项
+                result.pop(); //清空最后一项
             }
             const left = left_array ? left_array.getValue : data[start - 1].exp;
             const right = data.slice(start + 1, end).reduce((cur, next) => {
